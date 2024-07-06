@@ -6,13 +6,10 @@ const register = async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    // Check if user already exists
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ msg: 'User already exists' });
     }
-
-    // Create new user
     const salt = bcrypt.genSaltSync(10);
     const passwordHash = bcrypt.hashSync(password, salt);
 
@@ -25,10 +22,8 @@ const register = async (req, res) => {
 
     await user.save();
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
 
-    res.status(201).json({ token });
+    res.status(201);
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
@@ -52,7 +47,9 @@ const login = async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, 'secret123',
+      // { expiresIn: '24h' }
+    );
 
     res.json({ token });
   } catch (err) {
@@ -60,5 +57,6 @@ const login = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
 
 export { register, login };

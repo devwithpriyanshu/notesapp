@@ -5,17 +5,22 @@ import Note from '../models/note.js';
 
 /* Create a note */
 router.post('/create', async (req, res) => {
-  const note = new Note({
-    userId: req.user.userId,
-    ...req.body,
-  });
-  await note.save();
-  res.status(201).send(note);
+  try {
+    const note = new Note({
+      userId: req.user.userId,
+      ...req.body,
+    });
+    await note.save();
+    res.status(201).send(note);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Server error' });
+  }
 });
 
 /* Get all notes */
 router.get('/all', async (req, res) => {
-  const notes = await Note.find({ userId: req.user.userId });
+  const notes = await Note.find({ userId: req.user.userId, isArchived : false }).sort({ updatedAt: -1 });;
   res.json(notes);
 });
 
@@ -35,14 +40,20 @@ router.get('/label', async (req, res) => {
   });
   res.json(notes);
 });
-/* Change background color */
-router.put('/changebg', async (req, res) => {
-  const note = await Note.findOneAndUpdate(
-    { userId: req.user.userId, _id: req.body.id },
-    { backgroundColor: req.body.backgroundColor },
-    { new: true }
-  );
-  res.json(note);
+/* Update Note */
+router.put('/update', async (req, res) => {
+  try {
+    console.log(req.body)
+    const note = await Note.findOneAndUpdate(
+      { userId: req.user.userId, _id: req.body._id },
+      { ...req.body },
+      { new: true }
+    );
+    res.json(note);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Server error' });
+  }
 });
 /* Get trash notes( deleted notes under 30 days) */
 router.get('/trash', async (req, res) => {
@@ -56,7 +67,7 @@ router.get('/trash', async (req, res) => {
 router.get('/archives', async (req, res) => {
   const notes = await Note.find({
     userId: req.user.userId,
-    archivedAt: { $lt: new Date() },
+    isArchived: true,
   });
   res.json(notes);
 });
