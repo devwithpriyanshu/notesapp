@@ -1,5 +1,4 @@
-import { fetchNotes } from "./scripts/api/notes/fetchNotes.js";
-
+import { fetchNotes } from './scripts/api/notes/fetchNotes.js';
 
 export function toggleEdit(noteElement, isEditing) {
   const title = noteElement.querySelector('.note-title');
@@ -65,7 +64,7 @@ export function saveNoteChanges(noteElement, note, archived) {
       toggleEdit(noteElement, false);
       notesList.innerHTML = '';
 
-      fetchNotes(archived ? 'archived' : 'unarchived');
+      fetchNotes(archived ? 'archives' : 'all');
     })
     .catch((error) => {
       console.error('Error:', error);
@@ -76,7 +75,7 @@ export function saveNoteChanges(noteElement, note, archived) {
     });
 }
 
-export function toggleArchive(noteElement,note, archived) {
+export function toggleArchive(note, archived) {
   const token = localStorage.getItem('token');
   if (!token) {
     console.error('No token found');
@@ -88,7 +87,7 @@ export function toggleArchive(noteElement,note, archived) {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({_id:note._id, isArchived: !archived}),
+    body: JSON.stringify({ _id: note._id, isArchived: !archived }),
   })
     .then((response) => {
       if (!response.ok) {
@@ -97,11 +96,46 @@ export function toggleArchive(noteElement,note, archived) {
       return response.json();
     })
     .then(() => {
-        notesList.innerHTML = '';
+      notesList.innerHTML = '';
 
-        fetchNotes(archived ? 'archived' : 'unarchived');
+      fetchNotes(archived ? 'archives' : 'all');
     })
     .catch((error) => {
       console.error('Error:', error);
     });
+}
+
+export function toggleDelete(note, trashed) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    console.error('No token found');
+    return;
+  }
+  fetch(`http://localhost:9000/api/v1/notes/${trashed ? 'restore':'delete'}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ _id: note._id}),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(() => {
+      notesList.innerHTML = '';
+
+      fetchNotes(trashed ? 'trash' : 'all');
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+}
+
+export function showNotesApp() {
+  document.getElementById('auth').style.display = 'none';
+  document.getElementById('notesApp').style.display = 'contents';
 }

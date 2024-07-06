@@ -1,4 +1,4 @@
-import { toggleEdit, saveNoteChanges, toggleArchive } from "../../util.js";
+import { toggleEdit, saveNoteChanges, toggleArchive, toggleDelete } from "../../util.js";
 
 export function renderSingleNote(note) {
     const singleNote = document.createElement('li');
@@ -14,13 +14,14 @@ export function renderSingleNote(note) {
             <button class="editbtn">Edit</button>
             <button class="savebtn" hidden>Save</button>
             <button class="archivebtn">${note.isArchived ? 'Unarchive': 'Archive'}</button>
-            <button class="deletebtn">Delete</button>
+            <button class="deletebtn">${note.isTrashed ? 'Restore': 'Delete'}</button>
         </div>
     `;
 
     singleNote.querySelector('.editbtn').addEventListener('click', () => toggleEdit(singleNote, true));
     singleNote.querySelector('.savebtn').addEventListener('click', () => saveNoteChanges(singleNote, note, note.isArchived));
-    singleNote.querySelector('.archivebtn').addEventListener('click', () => toggleArchive(singleNote, note, note.isArchived));
+    singleNote.querySelector('.archivebtn').addEventListener('click', () => toggleArchive(note, note.isArchived));
+    singleNote.querySelector('.deletebtn').addEventListener('click', () => toggleDelete( note, note.isTrashed));
 
     const colorInput = singleNote.querySelector('.note-bg-color');
     colorInput.addEventListener('input', (event) => {

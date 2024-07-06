@@ -3,7 +3,6 @@ const router = express.Router();
 
 import Note from '../models/note.js';
 
-/* Create a note */
 router.post('/create', async (req, res) => {
   try {
     const note = new Note({
@@ -18,13 +17,20 @@ router.post('/create', async (req, res) => {
   }
 });
 
-/* Get all notes */
 router.get('/all', async (req, res) => {
-  const notes = await Note.find({ userId: req.user.userId, isArchived : false }).sort({ updatedAt: -1 });;
-  res.json(notes);
+  try {
+    const notes = await Note.find({
+      userId: req.user.userId,
+      isArchived: false,
+      isTrashed: false,
+    }).sort({ updatedAt: -1 });
+    res.json(notes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Server error' });
+  }
 });
 
-/* Search in your notes */
 router.get('/search', async (req, res) => {
   const notes = await Note.find({
     userId: req.user.userId,
@@ -32,7 +38,7 @@ router.get('/search', async (req, res) => {
   });
   res.json(notes);
 });
-/* Get a particular label notes */
+
 router.get('/label', async (req, res) => {
   const notes = await Note.find({
     userId: req.user.userId,
@@ -40,10 +46,9 @@ router.get('/label', async (req, res) => {
   });
   res.json(notes);
 });
-/* Update Note */
+
 router.put('/update', async (req, res) => {
   try {
-    console.log(req.body)
     const note = await Note.findOneAndUpdate(
       { userId: req.user.userId, _id: req.body._id },
       { ...req.body },
@@ -55,29 +60,75 @@ router.put('/update', async (req, res) => {
     res.status(500).json({ msg: 'Server error' });
   }
 });
-/* Get trash notes( deleted notes under 30 days) */
+
+router.put('/delete', async (req, res) => {
+  try {
+    const note = await Note.findOneAndUpdate(
+      { userId: req.user.userId, _id: req.body._id },
+      { isTrashed: true, deletedAt: new Date() },
+      { new: true }
+    );
+    res.json(note);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+router.put('/restore', async (req, res) => {
+  try {
+    const note = await Note.findOneAndUpdate(
+      { userId: req.user.userId, _id: req.body._id, isTrashed: true },
+      { isTrashed: false, deletedAt: null },
+      { new: true }
+    );
+    res.json(note);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
 router.get('/trash', async (req, res) => {
-  const notes = await Note.find({
-    userId: req.user.userId,
-    deletedAt: { $lt: new Date() },
-  });
-  res.json(notes);
+  try {
+    const notes = await Note.find({
+      userId: req.user.userId,
+      isTrashed: true,
+      deletedAt: {
+        $gt: new Date(new Date().setDate(new Date().getDate() - 30)),
+      },
+    }).sort({ deletedAt: -1 });
+    res.json(notes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Server error' });
+  }
 });
-/* Get archived notes */
+
 router.get('/archives', async (req, res) => {
-  const notes = await Note.find({
-    userId: req.user.userId,
-    isArchived: true,
-  });
-  res.json(notes);
+  try {
+    const notes = await Note.find({
+      userId: req.user.userId,
+      isArchived: true,
+    });
+    res.json(notes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Server error' });
+  }
 });
-/* Get Reminder notes (notes under 30 days due date) */
+
 router.get('/reminder', async (req, res) => {
-  const notes = await Note.find({
-    userId: req.user.userId,
-    dueDate: { $lt: new Date() },
-  });
-  res.json(notes);
+  try {
+    const notes = await Note.find({
+      userId: req.user.userId,
+      dueDate: { $lt: new Date() },
+    });
+    res.json(notes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Server error' });
+  }
 });
 
 export default router;

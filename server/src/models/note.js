@@ -45,10 +45,10 @@ const NoteSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-    dueDate:{
+    dueDate: {
       type: Date,
       default: null,
-    }
+    },
   },
   { timestamps: true }
 );

@@ -1,28 +1,40 @@
 import { fetchNotes } from './api/notes/fetchNotes.js';
 import { createNote } from './api/notes/createNote.js';
-
+import { signingup } from './components/signup.js';
+import { loggingin } from './components/loggingin.js';
+import { showNotesApp } from '../util.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  let currentView = 'all';
 
-  const addNotebtn = document.getElementById('addNotebtn');
-  const archivebtn = document.getElementById('archivebtn');
-  const homebtn = document.getElementById('homebtn');
-
-
-  let currentView = 'unarchived';
-  fetchNotes(currentView);
-
-  addNotebtn.addEventListener('click', createNote);
-  homebtn.addEventListener('click', () => {
-    currentView = 'unarchived';
+  document.getElementById('addNotebtn').addEventListener('click', createNote);
+  document.getElementById('homebtn').addEventListener('click', () => {
+    currentView = 'all';
     fetchNotes(currentView);
   });
-  archivebtn.addEventListener('click', () => {
-    currentView = 'archived';
+  document.getElementById('archivebtn').addEventListener('click', () => {
+    currentView = 'archives';
+    fetchNotes(currentView);
+  });
+  document.getElementById('trashbtn').addEventListener('click', () => {
+    currentView = 'trash';
     fetchNotes(currentView);
   });
 
+  document.getElementById('signupForm').addEventListener('submit', signingup);
 
+  document.getElementById('loginForm').addEventListener('submit', loggingin);
 
+  document.getElementById('logoutbtn').addEventListener('click', () => {
+    localStorage.removeItem('token');
+    alert('Logout successful!');
+    document.getElementById('auth').style.display = 'block';
+    document.getElementById('notesApp').style.display = 'none';
+  });
 
+  const token = localStorage.getItem('token');
+  if (token) {
+    showNotesApp();
+    fetchNotes(currentView);
+  }
 });

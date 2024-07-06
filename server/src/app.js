@@ -8,9 +8,10 @@ const app = express();
 app.use(
   cors({
     credentials: true,
-    origin: 'http://127.0.0.1:5500',
+    origin: 'http://localhost:5500',
   })
 );
+
 app.use(express.json());
 
 app.get('/', (req, res, next) => {
@@ -19,5 +20,7 @@ app.get('/', (req, res, next) => {
 
 app.use('/api/v1/notes', authMiddleware, notesRoutes);
 app.use('/api/v1/auth', authRoutes);
+
+
 
 export default app;

@@ -8,17 +8,12 @@ export function fetchNotes(currentView) {
     console.error('No token found');
     return;
   }
-  fetch(
-    `http://localhost:9000/api/v1/notes/${
-      currentView === 'archived' ? 'archives' : 'all'
-    }`,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  )
+  fetch(`http://localhost:9000/api/v1/notes/${currentView}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
