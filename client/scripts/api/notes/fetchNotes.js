@@ -1,6 +1,6 @@
 import { renderSingleNote } from '../../components/rendernote.js';
 
-export function fetchNotes(currentView) {
+export async function fetchNotes(currentView) {
   const notesList = document.getElementById('notesList');
   const token = localStorage.getItem('token');
 
@@ -8,6 +8,7 @@ export function fetchNotes(currentView) {
     console.error('No token found');
     return;
   }
+
   fetch(`http://localhost:9000/api/v1/notes/${currentView}`, {
     method: 'GET',
     headers: {
@@ -29,3 +30,5 @@ export function fetchNotes(currentView) {
     })
     .catch((error) => console.error('Error:', error));
 }
+
+

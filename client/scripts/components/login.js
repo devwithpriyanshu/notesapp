@@ -1,4 +1,5 @@
-import { showNotesApp } from "../../util.js";
+import { fetchNotes } from "../api/notes/fetchNotes.js";
+import { showNotesApp } from "../util.js";
 
 export async function loggingin(e) {
   e.preventDefault();
@@ -17,7 +18,7 @@ export async function loggingin(e) {
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        alert('Login successful!');
+        fetchNotes('all')
         showNotesApp();
       } else {
         alert(data.message || 'Login failed');

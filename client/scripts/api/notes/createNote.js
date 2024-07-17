@@ -29,7 +29,7 @@ export function createNote() {
     .then(() => {
         notesList.innerHTML = '';
 
-        fetchNotes('unarchived');
+        fetchNotes('all');
 
     })
     .catch((error) => console.error('Error:', error));

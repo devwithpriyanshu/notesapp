@@ -1,4 +1,5 @@
-import { showNotesApp } from "../../util.js";
+import { showNotesApp } from "../util.js";
+import { fetchNotes } from "../api/notes/fetchNotes.js";
 
 export async function signingup(e) {
   e.preventDefault();
@@ -21,7 +22,8 @@ export async function signingup(e) {
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        alert('Signup successful!');
+        // alert('Signup successful!');
+        fetchNotes('all');
         showNotesApp();
       } else {
         alert(data.message || 'Signup failed');

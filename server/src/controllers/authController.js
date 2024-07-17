@@ -21,9 +21,11 @@ const register = async (req, res) => {
     });
 
     await user.save();
+    const token = jwt.sign({ userId: user._id }, 'secret123',
+      { expiresIn: '24h' }
+    );
 
-
-    res.status(201);
+    res.status(201).json({token});
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
@@ -34,21 +36,18 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check for user
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
-    // Check password
     const isMatch = bcrypt.compareSync(password, user.passwordHash);
     if (!isMatch) {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
-    // Generate JWT token
     const token = jwt.sign({ userId: user._id }, 'secret123',
-      // { expiresIn: '24h' }
+      { expiresIn: '24h' }
     );
 
     res.json({ token });

@@ -14,21 +14,12 @@ const NoteSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    tags: [
+    labels: [
       {
-        type: String,
-        validate: {
-          validator: function (val) {
-            return val.length <= 9;
-          },
-          message: '{PATH} exceeds the limit of 9',
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Label',
       },
     ],
-    label: {
-      type: String,
-      default: null,
-    },
     isArchived: {
       type: Boolean,
       default: false,
@@ -52,6 +43,11 @@ const NoteSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+
+// NoteSchema.path('labels').validate(function (value) {
+//   return value.length <= 9;
+// }, 'Labels exceed the limit of 9');
 
 const Note = mongoose.model('Note', NoteSchema);
 

@@ -1,8 +1,12 @@
 import { fetchNotes } from './api/notes/fetchNotes.js';
 import { createNote } from './api/notes/createNote.js';
 import { signingup } from './components/signup.js';
-import { loggingin } from './components/loggingin.js';
-import { showNotesApp } from '../util.js';
+import { loggingin } from './components/login.js';
+import { displayLabels, showNotesApp } from './util.js';
+import { searchNotes } from './api/notes/searchNotes.js';
+import { Dropdown } from "https://cdn.jsdelivr.net/npm/jolty@0.6.2/dist/jolty.esm.min.js";
+
+Dropdown.initAll();
 
 document.addEventListener('DOMContentLoaded', () => {
   let currentView = 'all';
@@ -27,14 +31,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('logoutbtn').addEventListener('click', () => {
     localStorage.removeItem('token');
-    alert('Logout successful!');
-    document.getElementById('auth').style.display = 'block';
+    document.getElementById('auth').style.display = 'flex';
     document.getElementById('notesApp').style.display = 'none';
   });
+  document.getElementById('searchbtn').addEventListener('click',searchNotes);
 
   const token = localStorage.getItem('token');
   if (token) {
-    showNotesApp();
     fetchNotes(currentView);
+    displayLabels();
+    showNotesApp();
   }
 });
